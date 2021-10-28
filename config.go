@@ -9,10 +9,12 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/PaesslerAG/jsonpath"
 	"github.com/affanshahid/walkmap"
 	"github.com/imdario/mergo"
+	"github.com/spf13/cast"
 )
 
 const development = "development"
@@ -197,12 +199,138 @@ func (c *Config) set(paths []string, val interface{}) {
 	v.SetMapIndex(reflect.ValueOf(paths[len(paths)-1]), reflect.ValueOf(val))
 }
 
-func (c *Config) TryGet(path string) (interface{}, error) {
+func (c *Config) Get(path string) (interface{}, error) {
 	return jsonpath.Get(path, c.store)
 }
 
-func (c *Config) Get(path string) interface{} {
-	v, err := jsonpath.Get(path, c.store)
+func (c *Config) GetString(path string) (string, error) {
+	out, err := jsonpath.Get(path, c.store)
+	if err != nil {
+		return "", err
+	}
+
+	return cast.ToStringE(out)
+}
+
+func (c *Config) GetBool(path string) (bool, error) {
+	out, err := jsonpath.Get(path, c.store)
+	if err != nil {
+		return false, err
+	}
+
+	return cast.ToBoolE(out)
+}
+
+func (c *Config) GetInt(path string) (int, error) {
+	out, err := jsonpath.Get(path, c.store)
+	if err != nil {
+		return 0, err
+	}
+
+	return cast.ToIntE(out)
+}
+
+func (c *Config) GetInt32(path string) (int32, error) {
+	out, err := jsonpath.Get(path, c.store)
+	if err != nil {
+		return 0, err
+	}
+
+	return cast.ToInt32E(out)
+}
+
+func (c *Config) GetInt64(path string) (int64, error) {
+	out, err := jsonpath.Get(path, c.store)
+	if err != nil {
+		return 0, err
+	}
+
+	return cast.ToInt64E(out)
+}
+
+func (c *Config) GetUint(path string) (uint, error) {
+	out, err := jsonpath.Get(path, c.store)
+	if err != nil {
+		return 0, err
+	}
+
+	return cast.ToUintE(out)
+}
+
+func (c *Config) GetUint32(path string) (uint32, error) {
+	out, err := jsonpath.Get(path, c.store)
+	if err != nil {
+		return 0, err
+	}
+
+	return cast.ToUint32E(out)
+}
+
+func (c *Config) GetUint64(path string) (uint64, error) {
+	out, err := jsonpath.Get(path, c.store)
+	if err != nil {
+		return 0, err
+	}
+
+	return cast.ToUint64E(out)
+}
+
+func (c *Config) GetFloat64(path string) (float64, error) {
+	out, err := jsonpath.Get(path, c.store)
+	if err != nil {
+		return 0, err
+	}
+
+	return cast.ToFloat64E(out)
+}
+
+func (c *Config) GetTime(path string) (time.Time, error) {
+	out, err := jsonpath.Get(path, c.store)
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	return cast.ToTimeE(out)
+}
+
+func (c *Config) GetDuration(path string) (time.Duration, error) {
+	out, err := jsonpath.Get(path, c.store)
+	if err != nil {
+		return time.Duration(0), err
+	}
+
+	return cast.ToDurationE(out)
+}
+
+func (c *Config) GetIntSlice(path string) ([]int, error) {
+	out, err := jsonpath.Get(path, c.store)
+	if err != nil {
+		return nil, err
+	}
+
+	return cast.ToIntSliceE(out)
+}
+
+func (c *Config) GetStringSlice(path string) ([]string, error) {
+	out, err := jsonpath.Get(path, c.store)
+	if err != nil {
+		return nil, err
+	}
+
+	return cast.ToStringSliceE(out)
+}
+
+func (c *Config) GetStringMap(path string) (map[string]interface{}, error) {
+	out, err := jsonpath.Get(path, c.store)
+	if err != nil {
+		return nil, err
+	}
+
+	return cast.ToStringMapE(out)
+}
+
+func (c *Config) MustGet(path string) interface{} {
+	v, err := c.Get(path)
 	if err != nil {
 		panic(err)
 	}
