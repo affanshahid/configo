@@ -15,8 +15,10 @@ import (
 	"github.com/imdario/mergo"
 )
 
+const development = "development"
+
 type environment struct {
-	deployment string
+	deployment, instance, shortHostname, fullHostname string
 }
 
 type Config struct {
@@ -27,20 +29,57 @@ type Config struct {
 
 type ConfigOption func(*Config)
 
-func NewConfig(dir string, opts ...ConfigOption) *Config {
-	c := &Config{dir: dir, environment: environment{"development"}}
+func NewConfig(dir string, opts ...ConfigOption) (*Config, error) {
+	hostname, err := os.Hostname()
+	if err != nil {
+		return nil, err
+	}
+
+	shortHostname := strings.Split(hostname, ".")[0]
+
+	c := &Config{dir: dir, environment: environment{development, "", shortHostname, hostname}}
 
 	for _, opt := range opts {
 		opt(c)
 	}
 
-	return c
+	return c, nil
 }
 
 func WithDeployment(deployment string) ConfigOption {
 	return func(c *Config) {
 		c.deployment = deployment
 	}
+}
+
+func WithInstance(instance string) ConfigOption {
+	return func(c *Config) {
+		c.instance = instance
+	}
+}
+
+func WithHostname(hostname string) ConfigOption {
+	return func(c *Config) {
+		c.shortHostname = strings.Split(hostname, ".")[0]
+		c.fullHostname = hostname
+	}
+}
+
+func WithDeploymentFromEnv(env string) ConfigOption {
+	deployment, exists := os.LookupEnv(env)
+	if exists {
+		return WithDeployment(deployment)
+	} else {
+		return WithDeployment(development)
+	}
+}
+
+func WithInstanceFromEnv(env string) ConfigOption {
+	return WithInstance(os.Getenv(env))
+}
+
+func WithHostnameFromEnv(env string) ConfigOption {
+	return WithHostname(os.Getenv(env))
 }
 
 func (c *Config) Initialize() error {
@@ -64,6 +103,9 @@ func (c *Config) Initialize() error {
 
 	for _, tmpl := range orderedTemplates {
 		filename := getExpectedBasename(tmpl, c.environment)
+		if filename == "" {
+			continue
+		}
 
 		entry, found := fileMap[filename]
 		if !found {
@@ -137,21 +179,22 @@ func (c *Config) loadOverrides(data map[string]interface{}) error {
 
 func (c *Config) set(paths []string, val interface{}) {
 	v := reflect.ValueOf(c.store)
-	for _, s := range paths {
-		l := reflect.TypeOf(v.Interface())
-		k := l.Kind()
-
-		l2 := reflect.TypeOf(s)
-		k2 := l2.Kind()
-		t := v.Interface()
-		fmt.Println(k, k2, t)
-
+	for i := 0; i < len(paths)-1; i++ {
+		s := paths[i]
+		if v.Kind() == reflect.Interface {
+			v = v.Elem()
+		}
 		if i, err := strconv.Atoi(s); err == nil {
 			v = v.Index(i)
 		}
 		v = v.MapIndex(reflect.ValueOf(s))
 	}
-	v.Set(reflect.ValueOf(val))
+
+	if v.Kind() == reflect.Interface {
+		v = v.Elem()
+	}
+
+	v.SetMapIndex(reflect.ValueOf(paths[len(paths)-1]), reflect.ValueOf(val))
 }
 
 func (c *Config) TryGet(path string) (interface{}, error) {
