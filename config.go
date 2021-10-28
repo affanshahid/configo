@@ -17,20 +17,46 @@ import (
 	"github.com/spf13/cast"
 )
 
-const development = "development"
+const development = "dev"
 
 type environment struct {
 	deployment, instance, shortHostname, fullHostname string
 }
 
+// Config is a hierarchical loader and access point for configurations.
+// It allows loading configurations from mutiple files while being cognizant
+// of the einvironment.
+// Files are loading in the following order:
+// `default.EXT`
+// `default-{instance}.EXT`
+// `{deployment}.EXT`
+// `{deployment}-{instance}.EXT`
+// `{short_hostname}.EXT`
+// `{short_hostname}-{instance}.EXT`
+// `{short_hostname}-{deployment}.EXT`
+// `{short_hostname}-{deployment}-{instance}.EXT`
+// `{full_hostname}.EXT`
+// `{full_hostname}-{instance}.EXT`
+// `{full_hostname}-{deployment}.EXT`
+// `{full_hostname}-{deployment}-{instance}.EXT`
+// `local.EXT`
+// `local-{instance}.EXT`
+// `local-{deployment}.EXT`
+// `local-{deployment}-{instance}.EXT`
+// Each file overrides configurations from the file above. There is a special file called `env.EXT`
+// which allows overriding configurations using environment variables
 type Config struct {
 	environment
 	dir   string
 	store map[string]interface{}
 }
 
+// ConfigOption is a functional option to configure a Config instance
 type ConfigOption func(*Config)
 
+// NewConfig creates a new Config
+// dir is the path to the directory containing the config files
+// opts are functional options
 func NewConfig(dir string, opts ...ConfigOption) (*Config, error) {
 	hostname, err := os.Hostname()
 	if err != nil {
@@ -48,18 +74,21 @@ func NewConfig(dir string, opts ...ConfigOption) (*Config, error) {
 	return c, nil
 }
 
+// WithDeployment sets the given deployment
 func WithDeployment(deployment string) ConfigOption {
 	return func(c *Config) {
 		c.deployment = deployment
 	}
 }
 
+// WithDeployment sets the given instance
 func WithInstance(instance string) ConfigOption {
 	return func(c *Config) {
 		c.instance = instance
 	}
 }
 
+// WithDeployment uses the given string to set shortHostname and fullHostname
 func WithHostname(hostname string) ConfigOption {
 	return func(c *Config) {
 		c.shortHostname = strings.Split(hostname, ".")[0]
