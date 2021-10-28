@@ -25,6 +25,8 @@ var orderedTemplates = []string{
 	// `local-{deployment}-{instance}`,
 }
 
+const envFileName = "env"
+
 var defaultProviders = map[string]provider.Provider{
 	".yaml": &provider.YamlProvider{},
 	".yml":  &provider.YamlProvider{},
