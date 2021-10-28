@@ -336,3 +336,115 @@ func (c *Config) MustGet(path string) interface{} {
 	}
 	return v
 }
+
+func (c *Config) MustGetString(path string) string {
+	v, err := c.GetString(path)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (c *Config) MustGetBool(path string) bool {
+	v, err := c.GetBool(path)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (c *Config) MustGetInt(path string) int {
+	v, err := c.GetInt(path)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (c *Config) MustGetInt32(path string) int32 {
+	v, err := c.GetInt32(path)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (c *Config) MustGetInt64(path string) int64 {
+	v, err := c.GetInt64(path)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (c *Config) MustGetUint(path string) uint {
+	v, err := c.GetUint(path)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (c *Config) MustGetUint32(path string) uint32 {
+	v, err := c.GetUint32(path)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (c *Config) MustGetUint64(path string) uint64 {
+	v, err := c.GetUint64(path)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (c *Config) MustGetFloat64(path string) float64 {
+	v, err := c.GetFloat64(path)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (c *Config) MustGetTime(path string) time.Time {
+	v, err := c.GetTime(path)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (c *Config) MustGetDuration(path string) time.Duration {
+	v, err := c.GetDuration(path)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (c *Config) MustGetIntSlice(path string) []int {
+	v, err := c.GetIntSlice(path)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (c *Config) MustGetStringSlice(path string) []string {
+	v, err := c.GetStringSlice(path)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (c *Config) MustGetStringMap(path string) map[string]interface{} {
+	v, err := c.GetStringMap(path)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
