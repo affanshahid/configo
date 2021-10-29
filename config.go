@@ -43,8 +43,14 @@ type environment struct {
 // `local-{instance}.EXT`
 // `local-{deployment}.EXT`
 // `local-{deployment}-{instance}.EXT`
-// Each file overrides configurations from the file above. There is a special file called `env.EXT`
-// which allows overriding configurations using environment variables
+// EXT can be: `yaml`, `yml`, `json`, `json5`, `hjson`, `toml`
+// deployment defines your current environment i.e dev, test, prod etc (defaults to "dev")
+// instance can be the node ID in a multi-node deployment (defaults to "")
+// shortHostname is the hostname till the first `.` (derived from `os.Hostname()` by default)
+// fullHostname is the full host name (defaults to `os.Hostname()`)
+// Each file overrides configurations from the file above.
+// There is a special file called `env.EXT` which allows overriding
+// configurations using environment variables
 type Config struct {
 	environment
 	dir   string
@@ -81,14 +87,14 @@ func WithDeployment(deployment string) ConfigOption {
 	}
 }
 
-// WithDeployment sets the given instance
+// WithInstance sets the given instance
 func WithInstance(instance string) ConfigOption {
 	return func(c *Config) {
 		c.instance = instance
 	}
 }
 
-// WithDeployment uses the given string to set shortHostname and fullHostname
+// WithHostname uses the given string to set shortHostname and fullHostname
 func WithHostname(hostname string) ConfigOption {
 	return func(c *Config) {
 		c.shortHostname = strings.Split(hostname, ".")[0]
@@ -96,6 +102,7 @@ func WithHostname(hostname string) ConfigOption {
 	}
 }
 
+// WithDeploymentFromEnv loads the deployment label from the given environment variable
 func WithDeploymentFromEnv(env string) ConfigOption {
 	deployment, exists := os.LookupEnv(env)
 	if exists {
@@ -105,14 +112,18 @@ func WithDeploymentFromEnv(env string) ConfigOption {
 	}
 }
 
+// WithInstanceFromEnv loads the instance id from the given environment variable
 func WithInstanceFromEnv(env string) ConfigOption {
 	return WithInstance(os.Getenv(env))
 }
 
+// WithHostnameFromEnv loads the hostname from the given environment variable
 func WithHostnameFromEnv(env string) ConfigOption {
 	return WithHostname(os.Getenv(env))
 }
 
+// Initialize initializes and loads in the configurations
+// This must be called before attempting to get values
 func (c *Config) Initialize() error {
 	c.store = map[string]interface{}{}
 

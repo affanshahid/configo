@@ -28,8 +28,12 @@ var orderedTemplates = []string{
 const envFileName = "env"
 
 var defaultProviders = map[string]provider.Provider{
-	".yaml": &provider.YamlProvider{},
-	".yml":  &provider.YamlProvider{},
+	".yaml":  &provider.YamlProvider{},
+	".yml":   &provider.YamlProvider{},
+	".json":  &provider.JsonProvider{},
+	".json5": &provider.Json5Provider{},
+	".hjson": &provider.HjsonProvider{},
+	".toml":  &provider.TomlProvider{},
 }
 
 func getExpectedBasename(tmpl string, env environment) (ret string) {
