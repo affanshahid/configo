@@ -27,27 +27,33 @@ type environment struct {
 // It allows loading configurations from mutiple files while being cognizant
 // of the einvironment.
 // Files are loading in the following order:
-// `default.EXT`
-// `default-{instance}.EXT`
-// `{deployment}.EXT`
-// `{deployment}-{instance}.EXT`
-// `{short_hostname}.EXT`
-// `{short_hostname}-{instance}.EXT`
-// `{short_hostname}-{deployment}.EXT`
-// `{short_hostname}-{deployment}-{instance}.EXT`
-// `{full_hostname}.EXT`
-// `{full_hostname}-{instance}.EXT`
-// `{full_hostname}-{deployment}.EXT`
-// `{full_hostname}-{deployment}-{instance}.EXT`
-// `local.EXT`
-// `local-{instance}.EXT`
-// `local-{deployment}.EXT`
-// `local-{deployment}-{instance}.EXT`
+//	 default.EXT
+//	 default-{instance}.EXT
+//	 {deployment}.EXT
+//	 {deployment}-{instance}.EXT
+//	 {short_hostname}.EXT
+//	 {short_hostname}-{instance}.EXT
+//	 {short_hostname}-{deployment}.EXT
+//	 {short_hostname}-{deployment}-{instance}.EXT
+//	 {full_hostname}.EXT
+//	 {full_hostname}-{instance}.EXT
+//	 {full_hostname}-{deployment}.EXT
+//	 {full_hostname}-{deployment}-{instance}.EXT
+//	 local.EXT
+//	 local-{instance}.EXT
+//	 local-{deployment}.EXT
+//	 local-{deployment}-{instance}.EXT
+//
 // EXT can be: `yaml`, `yml`, `json`, `json5`, `hjson`, `toml`
+//
 // deployment defines your current environment i.e dev, test, prod etc (defaults to "dev")
+//
 // instance can be the node ID in a multi-node deployment (defaults to "")
+//
 // shortHostname is the hostname till the first `.` (derived from `os.Hostname()` by default)
+//
 // fullHostname is the full host name (defaults to `os.Hostname()`)
+//
 // Each file overrides configurations from the file above.
 // There is a special file called `env.EXT` which allows overriding
 // configurations using environment variables
@@ -239,10 +245,12 @@ func (c *Config) set(paths []string, val interface{}) {
 	v.SetMapIndex(reflect.ValueOf(paths[len(paths)-1]), reflect.ValueOf(val))
 }
 
+// Get returns the value at the given path as an interface
 func (c *Config) Get(path string) (interface{}, error) {
 	return jsonpath.Get(path, c.store)
 }
 
+// GetString returns the value at the given path as a string
 func (c *Config) GetString(path string) (string, error) {
 	out, err := jsonpath.Get(path, c.store)
 	if err != nil {
@@ -252,6 +260,7 @@ func (c *Config) GetString(path string) (string, error) {
 	return cast.ToStringE(out)
 }
 
+// GetBool returns the value at the given path as a boolean
 func (c *Config) GetBool(path string) (bool, error) {
 	out, err := jsonpath.Get(path, c.store)
 	if err != nil {
@@ -261,6 +270,7 @@ func (c *Config) GetBool(path string) (bool, error) {
 	return cast.ToBoolE(out)
 }
 
+// GetInt returns the value at the given path as a int
 func (c *Config) GetInt(path string) (int, error) {
 	out, err := jsonpath.Get(path, c.store)
 	if err != nil {
@@ -270,6 +280,7 @@ func (c *Config) GetInt(path string) (int, error) {
 	return cast.ToIntE(out)
 }
 
+// GetInt32 returns the value at the given path as a int32
 func (c *Config) GetInt32(path string) (int32, error) {
 	out, err := jsonpath.Get(path, c.store)
 	if err != nil {
@@ -279,6 +290,7 @@ func (c *Config) GetInt32(path string) (int32, error) {
 	return cast.ToInt32E(out)
 }
 
+// GetInt64 returns the value at the given path as a int64
 func (c *Config) GetInt64(path string) (int64, error) {
 	out, err := jsonpath.Get(path, c.store)
 	if err != nil {
@@ -288,6 +300,7 @@ func (c *Config) GetInt64(path string) (int64, error) {
 	return cast.ToInt64E(out)
 }
 
+// GetUint returns the value at the given path as a uint
 func (c *Config) GetUint(path string) (uint, error) {
 	out, err := jsonpath.Get(path, c.store)
 	if err != nil {
@@ -297,6 +310,7 @@ func (c *Config) GetUint(path string) (uint, error) {
 	return cast.ToUintE(out)
 }
 
+// GetUint32 returns the value at the given path as a uint32
 func (c *Config) GetUint32(path string) (uint32, error) {
 	out, err := jsonpath.Get(path, c.store)
 	if err != nil {
@@ -306,6 +320,7 @@ func (c *Config) GetUint32(path string) (uint32, error) {
 	return cast.ToUint32E(out)
 }
 
+// GetUint64 returns the value at the given path as a uint64
 func (c *Config) GetUint64(path string) (uint64, error) {
 	out, err := jsonpath.Get(path, c.store)
 	if err != nil {
@@ -315,6 +330,7 @@ func (c *Config) GetUint64(path string) (uint64, error) {
 	return cast.ToUint64E(out)
 }
 
+// GetFloat64 returns the value at the given path as a float64
 func (c *Config) GetFloat64(path string) (float64, error) {
 	out, err := jsonpath.Get(path, c.store)
 	if err != nil {
@@ -324,6 +340,7 @@ func (c *Config) GetFloat64(path string) (float64, error) {
 	return cast.ToFloat64E(out)
 }
 
+// GetTime returns the value at the given path as time
 func (c *Config) GetTime(path string) (time.Time, error) {
 	out, err := jsonpath.Get(path, c.store)
 	if err != nil {
@@ -333,6 +350,7 @@ func (c *Config) GetTime(path string) (time.Time, error) {
 	return cast.ToTimeE(out)
 }
 
+// GetDuration returns the value at the given path as a duration
 func (c *Config) GetDuration(path string) (time.Duration, error) {
 	out, err := jsonpath.Get(path, c.store)
 	if err != nil {
@@ -342,6 +360,7 @@ func (c *Config) GetDuration(path string) (time.Duration, error) {
 	return cast.ToDurationE(out)
 }
 
+// GetIntSlice returns the value at the given path as a slice of int values
 func (c *Config) GetIntSlice(path string) ([]int, error) {
 	out, err := jsonpath.Get(path, c.store)
 	if err != nil {
@@ -351,6 +370,7 @@ func (c *Config) GetIntSlice(path string) ([]int, error) {
 	return cast.ToIntSliceE(out)
 }
 
+// GetStringSlice returns the value at the given path as a slice of string values
 func (c *Config) GetStringSlice(path string) ([]string, error) {
 	out, err := jsonpath.Get(path, c.store)
 	if err != nil {
@@ -360,6 +380,8 @@ func (c *Config) GetStringSlice(path string) ([]string, error) {
 	return cast.ToStringSliceE(out)
 }
 
+// GetStringMap returns the value at the given path as a map with string keys
+// and values as interfaces
 func (c *Config) GetStringMap(path string) (map[string]interface{}, error) {
 	out, err := jsonpath.Get(path, c.store)
 	if err != nil {
@@ -369,6 +391,7 @@ func (c *Config) GetStringMap(path string) (map[string]interface{}, error) {
 	return cast.ToStringMapE(out)
 }
 
+// MustGet is the same as `Get` except it panics in case of an error
 func (c *Config) MustGet(path string) interface{} {
 	v, err := c.Get(path)
 	if err != nil {
@@ -377,6 +400,7 @@ func (c *Config) MustGet(path string) interface{} {
 	return v
 }
 
+// MustGetString is the same as `GetString` except it panics in case of an error
 func (c *Config) MustGetString(path string) string {
 	v, err := c.GetString(path)
 	if err != nil {
@@ -385,6 +409,7 @@ func (c *Config) MustGetString(path string) string {
 	return v
 }
 
+// MustGetBool is the same as `GetBool` except it panics in case of an error
 func (c *Config) MustGetBool(path string) bool {
 	v, err := c.GetBool(path)
 	if err != nil {
@@ -393,6 +418,7 @@ func (c *Config) MustGetBool(path string) bool {
 	return v
 }
 
+// MustGetInt is the same as `GetInt` except it panics in case of an error
 func (c *Config) MustGetInt(path string) int {
 	v, err := c.GetInt(path)
 	if err != nil {
@@ -401,6 +427,7 @@ func (c *Config) MustGetInt(path string) int {
 	return v
 }
 
+// MustGetInt32 is the same as `GetInt32` except it panics in case of an error
 func (c *Config) MustGetInt32(path string) int32 {
 	v, err := c.GetInt32(path)
 	if err != nil {
@@ -409,6 +436,7 @@ func (c *Config) MustGetInt32(path string) int32 {
 	return v
 }
 
+// MustGetInt64 is the same as `GetInt64` except it panics in case of an error
 func (c *Config) MustGetInt64(path string) int64 {
 	v, err := c.GetInt64(path)
 	if err != nil {
@@ -417,6 +445,7 @@ func (c *Config) MustGetInt64(path string) int64 {
 	return v
 }
 
+// MustGetUint is the same as `GetUint` except it panics in case of an error
 func (c *Config) MustGetUint(path string) uint {
 	v, err := c.GetUint(path)
 	if err != nil {
@@ -425,6 +454,7 @@ func (c *Config) MustGetUint(path string) uint {
 	return v
 }
 
+// MustGetUint32 is the same as `GetUint32` except it panics in case of an error
 func (c *Config) MustGetUint32(path string) uint32 {
 	v, err := c.GetUint32(path)
 	if err != nil {
@@ -433,6 +463,7 @@ func (c *Config) MustGetUint32(path string) uint32 {
 	return v
 }
 
+// MustGetUint64 is the same as `GetUint64` except it panics in case of an error
 func (c *Config) MustGetUint64(path string) uint64 {
 	v, err := c.GetUint64(path)
 	if err != nil {
@@ -441,6 +472,7 @@ func (c *Config) MustGetUint64(path string) uint64 {
 	return v
 }
 
+// MustGetFloat64 is the same as `GetFloat64` except it panics in case of an error
 func (c *Config) MustGetFloat64(path string) float64 {
 	v, err := c.GetFloat64(path)
 	if err != nil {
@@ -449,6 +481,7 @@ func (c *Config) MustGetFloat64(path string) float64 {
 	return v
 }
 
+// MustGetTime is the same as `GetTime` except it panics in case of an error
 func (c *Config) MustGetTime(path string) time.Time {
 	v, err := c.GetTime(path)
 	if err != nil {
@@ -457,6 +490,7 @@ func (c *Config) MustGetTime(path string) time.Time {
 	return v
 }
 
+// MustGetDuration is the same as `GetDuration` except it panics in case of an error
 func (c *Config) MustGetDuration(path string) time.Duration {
 	v, err := c.GetDuration(path)
 	if err != nil {
@@ -465,6 +499,7 @@ func (c *Config) MustGetDuration(path string) time.Duration {
 	return v
 }
 
+// MustGetIntSlice is the same as `GetIntSlice` except it panics in case of an error
 func (c *Config) MustGetIntSlice(path string) []int {
 	v, err := c.GetIntSlice(path)
 	if err != nil {
@@ -473,6 +508,7 @@ func (c *Config) MustGetIntSlice(path string) []int {
 	return v
 }
 
+// MustGetStringSlice is the same as `GetStringSlice` except it panics in case of an error
 func (c *Config) MustGetStringSlice(path string) []string {
 	v, err := c.GetStringSlice(path)
 	if err != nil {
@@ -481,6 +517,7 @@ func (c *Config) MustGetStringSlice(path string) []string {
 	return v
 }
 
+// MustGetStringMap is the same as `GetStringMap` except it panics in case of an error
 func (c *Config) MustGetStringMap(path string) map[string]interface{} {
 	v, err := c.GetStringMap(path)
 	if err != nil {
