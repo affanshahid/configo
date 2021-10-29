@@ -3,7 +3,6 @@ package configo
 import (
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -26,6 +25,7 @@ type environment struct {
 // Config is a hierarchical loader and access point for configurations.
 // It allows loading configurations from mutiple files while being cognizant
 // of the einvironment.
+//
 // Files are loading in the following order:
 //	 default.EXT
 //	 default-{instance}.EXT
@@ -59,7 +59,7 @@ type environment struct {
 // configurations using environment variables
 type Config struct {
 	environment
-	dir   string
+	dir   fs.FS
 	store map[string]interface{}
 }
 
@@ -67,9 +67,9 @@ type Config struct {
 type ConfigOption func(*Config)
 
 // NewConfig creates a new Config
-// dir is the path to the directory containing the config files
+// dir is a FS of the directory containing the config files
 // opts are functional options
-func NewConfig(dir string, opts ...ConfigOption) (*Config, error) {
+func NewConfig(dir fs.FS, opts ...ConfigOption) (*Config, error) {
 	hostname, err := os.Hostname()
 	if err != nil {
 		return nil, err
@@ -133,7 +133,7 @@ func WithHostnameFromEnv(env string) ConfigOption {
 func (c *Config) Initialize() error {
 	c.store = map[string]interface{}{}
 
-	files, err := os.ReadDir(c.dir)
+	files, err := fs.ReadDir(c.dir, ".")
 	if err != nil {
 		return err
 	}
@@ -187,8 +187,7 @@ func (c *Config) Initialize() error {
 }
 
 func (c *Config) readFile(name string) (map[string]interface{}, error) {
-	path := filepath.Join(c.dir, name)
-	in, err := ioutil.ReadFile(path)
+	in, err := fs.ReadFile(c.dir, name)
 	if err != nil {
 		return nil, err
 	}
