@@ -36,6 +36,9 @@ var defaultProviders = map[string]Provider{
 
 func getExpectedBasename(tmpl string, env environment) (ret string) {
 	ret = strings.Replace(tmpl, "{deployment}", env.deployment, 1)
+	ret = strings.Replace(ret, "{instance}", env.instance, 1)
+	ret = strings.Replace(ret, "{shortHostname}", env.shortHostname, 1)
+	ret = strings.Replace(ret, "{fullHostname}", env.fullHostname, 1)
 
 	return ret
 }
