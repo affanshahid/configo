@@ -1,4 +1,4 @@
-package provider
+package configo
 
 // Provider is an interface for parsing a map from binary data
 type Provider interface {

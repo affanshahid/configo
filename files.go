@@ -2,8 +2,6 @@ package configo
 
 import (
 	"strings"
-
-	"github.com/affanshahid/configo/provider"
 )
 
 var orderedTemplates = []string{
@@ -27,13 +25,13 @@ var orderedTemplates = []string{
 
 const envFileName = "env"
 
-var defaultProviders = map[string]provider.Provider{
-	".yaml":  &provider.YamlProvider{},
-	".yml":   &provider.YamlProvider{},
-	".json":  &provider.JsonProvider{},
-	".json5": &provider.Json5Provider{},
-	".hjson": &provider.HjsonProvider{},
-	".toml":  &provider.TomlProvider{},
+var defaultProviders = map[string]Provider{
+	".yaml":  yamlProvider,
+	".yml":   yamlProvider,
+	".json":  jsonProvider,
+	".json5": json5Provider,
+	".hjson": hjsonProvider,
+	".toml":  tomlProvider,
 }
 
 func getExpectedBasename(tmpl string, env environment) (ret string) {
