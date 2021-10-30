@@ -67,12 +67,133 @@ func TestDefaultLoading(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	assert.Equal(t, "foo", config.MustGetString("root.prop1"))
+}
+
+func TestYamlProvider(t *testing.T) {
+	dir := fstest.MapFS{
+		"default.yml": {
+			Data: []byte(`
+                prop: foo
+            `),
+		},
+	}
+
+	config, err := configo.NewConfig(dir)
+	assert.Nilf(t, err, "err should be nil")
+
+	err = config.Initialize()
+	assert.Nilf(t, err, "err should be nil")
+
+	assert.Equal(t, "foo", config.MustGetString("prop"))
+}
+
+func TestJsonProvider(t *testing.T) {
+	dir := fstest.MapFS{
+		"default.json": {
+			Data: []byte(`
+                {
+                    "prop": "foo"
+                }
+            `),
+		},
+	}
+
+	config, err := configo.NewConfig(dir)
+	assert.Nilf(t, err, "err should be nil")
+
+	err = config.Initialize()
+	assert.Nilf(t, err, "err should be nil")
+
+	assert.Equal(t, "foo", config.MustGetString("prop"))
+}
+
+func TestJson5Provider(t *testing.T) {
+	dir := fstest.MapFS{
+		"default.json5": {
+			Data: []byte(`
+                {
+                    prop: 'foo',
+                }
+            `),
+		},
+	}
+
+	config, err := configo.NewConfig(dir)
+	assert.Nilf(t, err, "err should be nil")
+
+	err = config.Initialize()
+	assert.Nilf(t, err, "err should be nil")
+
+	assert.Equal(t, "foo", config.MustGetString("prop"))
+}
+
+func TestHjsonProvider(t *testing.T) {
+	dir := fstest.MapFS{
+		"default.hjson": {
+			Data: []byte(`
+                {
+                    // comment
+                    # comment
+                    prop: foo
+                }
+            `),
+		},
+	}
+
+	config, err := configo.NewConfig(dir)
+	assert.Nilf(t, err, "err should be nil")
+
+	err = config.Initialize()
+	assert.Nilf(t, err, "err should be nil")
+
+	assert.Equal(t, "foo", config.MustGetString("prop"))
+}
+
+func TestTomlProvider(t *testing.T) {
+	dir := fstest.MapFS{
+		"default.toml": {
+			Data: []byte(`
+                [foo]
+                    p1 = 1
+                    p2 = 2
+                [bar]
+                    p1 = "baz"
+            `),
+		},
+	}
+
+	config, err := configo.NewConfig(dir)
+	assert.Nilf(t, err, "err should be nil")
+
+	err = config.Initialize()
+	assert.Nilf(t, err, "err should be nil")
+
+	assert.Equal(t, 1, config.MustGetInt("foo.p1"))
+	assert.Equal(t, 2, config.MustGetInt("foo.p2"))
+	assert.Equal(t, "baz", config.MustGetString("bar.p1"))
+}
+
+func TestParseError(t *testing.T) {
+	dir := fstest.MapFS{
+		"default.yml": {
+			Data: []byte(`
+                in valid
+                ; hhvc: foo
+            `),
+		},
+	}
+
+	config, err := configo.NewConfig(dir)
+	assert.Nilf(t, err, "err should be nil")
+
+	err = config.Initialize()
+	assert.NotNil(t, err)
 }
 
 func TestWithDeployment(t *testing.T) {
@@ -93,10 +214,10 @@ func TestWithDeployment(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir, configo.WithDeployment("production"))
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	assert.Equal(t, "foo", config.MustGetString("root.prop1"))
 	assert.Equal(t, "baz", config.MustGetString("root.prop2"))
@@ -122,10 +243,10 @@ func TestWithDeploymentFromEnv(t *testing.T) {
 	os.Setenv("DEP", "production")
 
 	config, err := configo.NewConfig(dir, configo.WithDeploymentFromEnv("DEP"))
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	assert.Equal(t, "foo", config.MustGetString("root.prop1"))
 	assert.Equal(t, "baz", config.MustGetString("root.prop2"))
@@ -149,10 +270,10 @@ func TestWithInstance(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir, configo.WithInstance("inst1"))
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	assert.Equal(t, "foo", config.MustGetString("root.prop1"))
 	assert.Equal(t, "baz", config.MustGetString("root.prop2"))
@@ -178,10 +299,10 @@ func TestWithInstanceFromEnv(t *testing.T) {
 	os.Setenv("INST", "inst1")
 
 	config, err := configo.NewConfig(dir, configo.WithInstanceFromEnv("INST"))
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	assert.Equal(t, "foo", config.MustGetString("root.prop1"))
 	assert.Equal(t, "baz", config.MustGetString("root.prop2"))
@@ -219,10 +340,10 @@ func TestDefaultHostname(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir, configo.WithInstance("inst1"))
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	assert.Equal(t, "foo", config.MustGetString("root.prop1"))
 	assert.Equal(t, "baz", config.MustGetString("root.prop2"))
@@ -254,10 +375,10 @@ func TestWithHostname(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir, configo.WithHostname("service1.example.com"))
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	assert.Equal(t, "foo", config.MustGetString("root.prop1"))
 	assert.Equal(t, "baz", config.MustGetString("root.prop2"))
@@ -290,10 +411,10 @@ func TestWithHostnameFromEnv(t *testing.T) {
 	os.Setenv("HOSTNAME", "service1.example.com")
 
 	config, err := configo.NewConfig(dir, configo.WithHostnameFromEnv("HOSTNAME"))
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	assert.Equal(t, "foo", config.MustGetString("root.prop1"))
 	assert.Equal(t, "baz", config.MustGetString("root.prop2"))
@@ -510,10 +631,10 @@ func TestFileLoadingOrder(t *testing.T) {
 		configo.WithInstance("inst1"),
 		configo.WithHostname("service1.example.com"),
 	)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	assert.Equal(t, "default", config.MustGetString("p01"))
 	assert.Equal(t, "default-inst1", config.MustGetString("p02"))
@@ -533,6 +654,33 @@ func TestFileLoadingOrder(t *testing.T) {
 	assert.Equal(t, "local-production-inst1", config.MustGetString("p16"))
 }
 
+func TestEnvOverride(t *testing.T) {
+	dir := fstest.MapFS{
+		"default.yml": {
+			Data: []byte(`
+                p1: foo
+            `),
+		},
+		"env.yml": {
+			Data: []byte(`
+                p1: OVERRIDE_ENV
+            `),
+		},
+	}
+
+	os.Setenv("OVERRIDE_ENV", "bar")
+
+	config, err := configo.NewConfig(dir)
+	assert.Nilf(t, err, "err should be nil")
+
+	err = config.Initialize()
+	assert.Nilf(t, err, "err should be nil")
+
+	val, err := config.Get("p1")
+	assert.Nilf(t, err, "err should be nil")
+	assert.Equal(t, "bar", val)
+}
+
 func TestGet(t *testing.T) {
 	dir := fstest.MapFS{
 		"default.yml": {
@@ -543,13 +691,13 @@ func TestGet(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	val, err := config.Get("p1")
-	assert.Nil(t, err)
+	assert.Nilf(t, err, "err should be nil")
 	assert.Equal(t, "foo", val)
 }
 
@@ -563,10 +711,10 @@ func TestGetMissingPropertyError(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	_, err = config.Get("p2.p3")
 	assert.NotNil(t, err)
@@ -582,13 +730,13 @@ func TestGetString(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	val, err := config.GetString("p1")
-	assert.Nil(t, err)
+	assert.Nilf(t, err, "err should be nil")
 	assert.Equal(t, "foo", val)
 }
 
@@ -602,13 +750,13 @@ func TestGetBool(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	val, err := config.GetBool("p1")
-	assert.Nil(t, err)
+	assert.Nilf(t, err, "err should be nil")
 	assert.Equal(t, true, val)
 }
 
@@ -622,13 +770,13 @@ func TestGetInt(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	val, err := config.GetInt("p1")
-	assert.Nil(t, err)
+	assert.Nilf(t, err, "err should be nil")
 	assert.Equal(t, 10, val)
 }
 
@@ -642,13 +790,13 @@ func TestGetInt32(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	val, err := config.GetInt32("p1")
-	assert.Nil(t, err)
+	assert.Nilf(t, err, "err should be nil")
 	assert.Equal(t, int32(10), val)
 }
 
@@ -662,13 +810,13 @@ func TestGetInt64(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	val, err := config.GetInt64("p1")
-	assert.Nil(t, err)
+	assert.Nilf(t, err, "err should be nil")
 	assert.Equal(t, int64(10), val)
 }
 
@@ -682,13 +830,13 @@ func TestGetUint(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	val, err := config.GetUint("p1")
-	assert.Nil(t, err)
+	assert.Nilf(t, err, "err should be nil")
 	assert.Equal(t, uint(10), val)
 }
 
@@ -702,13 +850,13 @@ func TestGetUint32(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	val, err := config.GetUint32("p1")
-	assert.Nil(t, err)
+	assert.Nilf(t, err, "err should be nil")
 	assert.Equal(t, uint32(10), val)
 }
 
@@ -722,13 +870,13 @@ func TestGetUint64(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	val, err := config.GetUint64("p1")
-	assert.Nil(t, err)
+	assert.Nilf(t, err, "err should be nil")
 	assert.Equal(t, uint64(10), val)
 }
 
@@ -742,13 +890,13 @@ func TestGetFloat64(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	val, err := config.GetFloat64("p1")
-	assert.Nil(t, err)
+	assert.Nilf(t, err, "err should be nil")
 	assert.Equal(t, 10.0, val)
 }
 
@@ -762,13 +910,13 @@ func TestGetTime(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	val, err := config.GetTime("p1")
-	assert.Nil(t, err)
+	assert.Nilf(t, err, "err should be nil")
 	assert.Equal(t, time.Unix(1635565664, 0), val)
 }
 
@@ -782,13 +930,13 @@ func TestGetDuration(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	val, err := config.GetDuration("p1")
-	assert.Nil(t, err)
+	assert.Nilf(t, err, "err should be nil")
 	assert.Equal(t, time.Duration(10*time.Hour), val)
 }
 
@@ -805,13 +953,13 @@ func TestGetIntSlice(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	val, err := config.GetIntSlice("p1")
-	assert.Nil(t, err)
+	assert.Nilf(t, err, "err should be nil")
 	assert.Equal(t, []int{1, 2, 3}, val)
 }
 
@@ -828,13 +976,13 @@ func TestGetStringSlice(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	val, err := config.GetStringSlice("p1")
-	assert.Nil(t, err)
+	assert.Nilf(t, err, "err should be nil")
 	assert.Equal(t, []string{"foo", "bar", "baz"}, val)
 }
 
@@ -851,13 +999,13 @@ func TestGetStringMap(t *testing.T) {
 	}
 
 	config, err := configo.NewConfig(dir)
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	err = config.Initialize()
-	assert.Nil(t, err, "err should be nil")
+	assert.Nilf(t, err, "err should be nil")
 
 	val, err := config.GetStringMap("p1")
-	assert.Nil(t, err)
+	assert.Nilf(t, err, "err should be nil")
 	assert.Equal(
 		t,
 		map[string]interface{}{
