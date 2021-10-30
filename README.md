@@ -25,11 +25,7 @@ root:
 ```yml
 # config/production.yml
 root:
-  prop1: foo
-  prop2: 100
-  prop3: false
-  prop4:
-    nestedProp1: 4
+  prop2: 200
 ```
 
 ```sh
