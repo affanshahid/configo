@@ -36,9 +36,9 @@ Files are loading in the following order (Each file is optional, you may only cr
 
 EXT can be: `yaml`, `yml`, `json`, `json5`, `hjson`, `toml`
 
-`deployment` defines your current environment i.e dev, test, prod etc (defaults to "dev")
+`deployment` defines your current environment i.e dev, test, prod etc (defaults to `"dev"`)
 
-`instance` can be the node ID in a multi-node deployment (defaults to "")
+`instance` can be the node ID in a multi-node deployment (defaults to `""`)
 
 `shortHostname` is the hostname till the first `.` (derived from `os.Hostname()` by default)
 
@@ -108,7 +108,10 @@ func main() {
 	// Here we initialize the configurations and specify
 	// the environment variable from which to load the
 	// deployment name (the one we set above)
-	err := configo.Initialize(os.DirFS("./config"), configo.WithDeploymentFromEnv("APP_ENV"))
+	err := configo.Initialize(
+		os.DirFS("./config"),
+		configo.WithDeploymentFromEnv("APP_ENV"),
+	)
 	if err != nil {
 		panic(err)
 	}
